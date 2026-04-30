@@ -1,0 +1,50 @@
+﻿@model PhoneBookApplication.ApplicationServices.DTOs.GetAllPersonDto
+
+@{
+    ViewData["Title"] = "Contacts";
+}
+
+<h1>Contacts</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New Contact</a>
+</p>
+
+@if (Model != null && Model.GetByIdPersonDto.Any())
+{
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Phone Number</th>
+            <th>BirthDay</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model.GetByIdPersonDto)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.FirstName)</td>
+                <td>@Html.DisplayFor(modelItem => item.LastName)</td>
+                <td>@Html.DisplayFor(modelItem => item.PhoneNumber)</td>
+                <td>@Html.DisplayFor(modelItem => item.BirthDate)</td>
+                <td>@Html.DisplayFor(modelItem => item.UploadFile)</td>
+              
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Details</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info">
+        <h4>No contacts found</h4>
+        <p>Start by <a asp-action="Create">creating your first Contact</a>.</p>
+    </div>
+}
