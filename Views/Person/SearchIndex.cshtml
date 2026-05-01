@@ -1,5 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
-@model PhoneBookApplication.ViewModels.SearchPersonViewModel
+@model PhoneBookApplication.ApplicationServices.DTOs.GetAllPersonDto
 
 @{
     ViewData["Title"] = "Contacts";
@@ -7,21 +7,14 @@
 
 <h1>Contacts</h1>
 
-@if (Model != null && Model.GetAllPersonVM.GetByIdPersonDto.Any())
+@if (Model != null && Model.GetByIdPersonDto.Any())
 {
-    @using (Html.BeginForm())
-    {
-        <p>
-            @Html.TextBox("term")
-            <input type="submit" name="term" value="@Model.Term" placeholder="search here">
-        </p>
-    }
 
     <section class="search-bar">
         <form method="get" asp-action="SearchIndex">
             <input type="text" name="term" placeholder="search here">
-            <button type="submit"><i class="fa fa-search"></i></button>
-            <a class="btn btn-default" href="/Person/SearchIndex">All</a>
+            <button class="btn btn-default" type="submit" style="width: 48px; height: 28px; padding: 0; font-size: 16px; border: none; background: #FF0000 ; color: white;"><i></i>search</button>
+            <a class="btn btn-default" href="/Person/SearchIndex" style="background: #007bff; color: white;">All</a>
         </form>
     </section>
 
@@ -36,7 +29,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.GetAllPersonVM.GetByIdPersonDto)
+            @foreach (var item in Model.GetByIdPersonDto)
             {
                 <tr>
                     <td>@Html.DisplayFor(modelItem => item.FirstName)</td>
@@ -53,6 +46,8 @@ else
 {
     <div class="alert alert-info">
         <h4>No contacts found</h4>
-        <p>Start by <a asp-action="Create">creating your first Contact</a>.</p>
+        <p>
+            <a asp-action="SearchIndex" class="btn btn-primary btn-lg">Search Contacts</a>
+        </p>
     </div>
 }

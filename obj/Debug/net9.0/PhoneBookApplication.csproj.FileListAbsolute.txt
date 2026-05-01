@@ -229,3 +229,4 @@ C:\Users\moham\source\repos\PhoneBookSolution\PhoneBookApplication\obj\Debug\net
 C:\Users\moham\source\repos\PhoneBookSolution\PhoneBookApplication\obj\Debug\net9.0\ref\PhoneBookApplication.dll
 C:\Users\moham\source\repos\PhoneBookSolution\PhoneBookApplication\bin\Debug\net9.0\ResponseFramework.dll
 C:\Users\moham\source\repos\PhoneBookSolution\PhoneBookApplication\bin\Debug\net9.0\ResponseFramework.pdb
+C:\Users\moham\source\repos\PhoneBookSolution\PhoneBookApplication\obj\Debug\net9.0\PhoneBookApplication.sourcelink.json

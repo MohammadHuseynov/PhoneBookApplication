@@ -1,10 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using PhoneBookApplication.ApplicationServices.DTOs;
 using PhoneBookApplication.ApplicationServices.Services.Contracts;
 using PhoneBookApplication.Models.DomainModels.PersonAggregates;
+using System.Globalization;
 using System.Linq;
-using PhoneBookApplication.ViewModels;
+using System.Net;
+using PhoneBookApplication.Models;
+
 
 namespace PhoneBookApplication.Controllers
 {
@@ -41,53 +45,15 @@ namespace PhoneBookApplication.Controllers
 
             var response = await _personApplicationService.SearchPerson(term);
 
-            var viewModel = new SearchPersonViewModel
+            var viewModel = new GetAllPersonDto()
             {
                 Term = term,
-                GetAllPersonVM = new GetAllPersonDto
-                {
-                    //GetByIdPersonDto = response.Result ?? new List<GetAllPersonDto>()
-                }
+                GetByIdPersonDto = response.Result ?? new List<GetByIdPersonDto>()
+
             };
-            
+
             return View(viewModel);
 
-
-
-            //var model = new SearchPersonViewModel { Term = term };
-
-            //if (string.IsNullOrWhiteSpace(term))
-            //{
-            //    var allResponse = await _personApplicationService.GetAllPerson();
-            //    if (!allResponse.IsSuccessful)
-            //    {
-            //        ViewBag.ErrorMessage = allResponse.ErrorMessage ?? "An error occurred.";
-            //        return View(model); 
-            //    }
-
-
-            //    model.GetAllPersonVM= allResponse.Result
-            //        .Select(p => new SearchPersonDto
-            //        {
-            //            FirstName = p.FirstName,
-            //            LastName = p.LastName,
-            //            PhoneNumber = p.PhoneNumber
-            //        })
-            //        .ToList();
-            //}
-            //else
-            //{
-            //    var searchResponse = await _personApplicationService.SearchPerson(term);
-            //    if (!searchResponse.IsSuccessful)
-            //    {
-            //        ViewBag.ErrorMessage = searchResponse.ErrorMessage ?? "An error occurred.";
-            //        return View(model);
-            //    }
-
-            //    model.SearchPersonVM = searchResponse.Result;
-            //}
-
-            //return View(model);
 
         }
         #endregion
@@ -125,7 +91,7 @@ namespace PhoneBookApplication.Controllers
         {
             if (!ModelState.IsValid)
                 return View(postPersonDto);
-
+            
             var response = await _personApplicationService.Post(postPersonDto);
             if (!response.IsSuccessful)
             {
@@ -147,8 +113,8 @@ namespace PhoneBookApplication.Controllers
             if (id == Guid.Empty)
                 return NotFound();
 
-            
-            var response = await _personApplicationService.GetByIdPerson(new GetByIdPersonDto{Id = id});
+
+            var response = await _personApplicationService.GetByIdPerson(new GetByIdPersonDto { Id = id });
 
             if (!response.IsSuccessful || response.Result == null)
                 return NotFound();

@@ -3,29 +3,40 @@ using PhoneBookApplication.Models.DomainModels.PersonAggregates;
 using PhoneBookApplication.Models.Services.Contracts;
 using ResponseFramework;
 using System.Net;
+using PhoneBookApplication.Models.DomainModels;
 
 namespace PhoneBookApplication.Models.Services.Repositories
 {
     public class PersonRepository : IPersonRepository
     {
         private readonly PhoneBookApplicationDbContext _context;
-       
+
         public PersonRepository(PhoneBookApplicationDbContext context)
         {
             _context = context;
         }
 
         #region [- Insert() -]
+
         public async Task<IResponse<bool>> Insert(Person person)
         {
             if (person == null)
                 return new Response<bool>("Person cannot be null.") { HttpStatusCode = HttpStatusCode.BadRequest };
+
+            var input = person.PhoneNumber;
+            var duplicate = (from d in _context.Person
+                             where d.PhoneNumber == input
+                             select d).ToList();
+
+            if (duplicate.Count >= 1)
+                return new Response<bool>(false,false, null, "can't enter a number twice",HttpStatusCode.Conflict);
 
             await _context.AddAsync(person);
             await SaveChangesAsync();
             return new Response<bool>(true, true, "Inserting was successful", null, HttpStatusCode.Created);
         }
         #endregion
+
 
         #region [- SelectById() -]
         public async Task<IResponse<Person>> SelectById(Guid id)
@@ -79,6 +90,14 @@ namespace PhoneBookApplication.Models.Services.Repositories
         {
             if (person == null)
                 return new Response<bool>("Person cannot be null.") { HttpStatusCode = HttpStatusCode.BadRequest };
+
+            var input = person.PhoneNumber;
+            var duplicate = (from d in _context.Person
+                             where d.PhoneNumber == input
+                             select d).ToList();
+
+            if (duplicate.Count >= 1)
+                return new Response<bool>("phone number already exists in the data base") { HttpStatusCode = HttpStatusCode.Conflict };
 
             _context.Update(person);
             await SaveChangesAsync();

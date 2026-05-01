@@ -2,12 +2,7 @@
 {
     public class Image
     {
-        public Guid Id { get; set; }
-
-        public string Name { get; set; }
-
-        public int Size { get; set; }
-
-        public BinaryData ImageBinaryData { get; set; }
+        public int Id { get; set; }
+        public byte[] ImageBinaryData { get; set; }
     }
 }

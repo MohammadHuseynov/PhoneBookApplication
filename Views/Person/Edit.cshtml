@@ -1,8 +1,10 @@
-﻿@model PhoneBookApplication.ApplicationServices.DTOs.PutPersonDto
+﻿@using System.Globalization
+@model PhoneBookApplication.ApplicationServices.DTOs.PutPersonDto
 
 @{
     ViewData["Title"] = "Edit Contact";
     var imagePath = "~/images/" + (Model.FilePath ?? "no-image.png");
+    PersianCalendar pc = new PersianCalendar();
 }
 
 <h1>Edit Contact</h1>
@@ -35,7 +37,7 @@
 
             <div class="form-group mb-3">
                 <label asp-for="BirthDate" class="control-label"></label>
-                <input asp-for="BirthDate" class="form-control" type="date" placeholder="1400/04/15" />
+                <input asp-for="BirthDate" class="form-control" type="datetime" min="1000/01/01" max="@pc.GetYear(DateTime.UtcNow)/@pc.GetMonth(DateTime.UtcNow)/@pc.GetDayOfMonth(DateTime.UtcNow)" placeholder="1400/04/15" />
                 <span asp-validation-for="BirthDate" class="text-danger"></span>
             </div>
 

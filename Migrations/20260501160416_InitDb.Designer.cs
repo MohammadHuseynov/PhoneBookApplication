@@ -12,7 +12,7 @@ using PhoneBookApplication.Models;
 namespace PhoneBookApplication.Migrations
 {
     [DbContext(typeof(PhoneBookApplicationDbContext))]
-    [Migration("20260430101145_InitDb")]
+    [Migration("20260501160416_InitDb")]
     partial class InitDb
     {
         /// <inheritdoc />
@@ -24,6 +24,23 @@ namespace PhoneBookApplication.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("PhoneBookApplication.Models.DomainModels.Image", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<byte[]>("ImageBinaryData")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Image");
+                });
 
             modelBuilder.Entity("PhoneBookApplication.Models.DomainModels.PersonAggregates.Person", b =>
                 {

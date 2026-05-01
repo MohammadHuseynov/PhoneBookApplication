@@ -16,7 +16,7 @@ namespace PhoneBookApplication.ApplicationServices.Services.Contracts
         #endregion
 
         #region [- SEARCH -]
-        Task<IResponse<List<SearchPersonDto>>> SearchPerson(string term);
+        Task<IResponse<List<GetByIdPersonDto>>> SearchPerson(string term);
         #endregion
 
         #region [- PUT -]

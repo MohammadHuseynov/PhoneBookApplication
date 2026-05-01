@@ -18,7 +18,6 @@ namespace PhoneBookApplication.Models.DomainModels.PersonAggregates
         [RegularExpression(@"^\+?[\d\s\-\(\)]{11}$") ]
         public string PhoneNumber { get; set; }
 
-       
         public DateTime? BirthDate { get; set; } 
 
         [NotMapped]

@@ -2,6 +2,7 @@
 using PhoneBookApplication.Models.DomainModels.PersonAggregates;
 using System.Globalization;
 using System.Reflection.Emit;
+using PhoneBookApplication.Models.DomainModels;
 
 namespace PhoneBookApplication.Models
 {
@@ -18,5 +19,6 @@ namespace PhoneBookApplication.Models
         }
 
         public DbSet<Person> Person { get; set; }
+        public DbSet<Image> Image { get; set; }
     }
 }

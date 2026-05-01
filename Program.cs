@@ -18,6 +18,7 @@ builder.Services.AddScoped<IPersonRepository, PersonRepository>();
 builder.Services.AddScoped<IPersonApplicationService, PersonApplicationService>();
 
 
+builder.Services.AddScoped<IImageRepository, ImageRepository>();
 
 
 

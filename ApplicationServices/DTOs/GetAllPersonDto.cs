@@ -4,5 +4,7 @@
     {
         public List<GetByIdPersonDto> GetByIdPersonDto { get; set; }
 
+        public string? Term { get; set; }
+
     }
 }

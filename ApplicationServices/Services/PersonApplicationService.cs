@@ -1,9 +1,13 @@
 ﻿using PhoneBookApplication.ApplicationServices.DTOs;
 using PhoneBookApplication.ApplicationServices.Services.Contracts;
 using PhoneBookApplication.Models.DomainModels.PersonAggregates;
+using PhoneBookApplication.Models.DomainModels;
 using PhoneBookApplication.Models.Services.Contracts;
 using ResponseFramework;
+using System;
 using System.Net;
+using System.Globalization;
+
 
 
 namespace PhoneBookApplication.ApplicationServices.Services
@@ -11,12 +15,14 @@ namespace PhoneBookApplication.ApplicationServices.Services
     public class PersonApplicationService : IPersonApplicationService
     {
         private readonly IPersonRepository _personRepository;
+        private readonly IImageRepository _imageRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public PersonApplicationService(IPersonRepository personRepository, IWebHostEnvironment webHostEnvironment)
+        public PersonApplicationService(IPersonRepository personRepository, IImageRepository imageRepository, IWebHostEnvironment webHostEnvironment)
         {
             _personRepository = personRepository;
             _webHostEnvironment = webHostEnvironment;
+            _imageRepository = imageRepository;
         }
 
 
@@ -34,12 +40,20 @@ namespace PhoneBookApplication.ApplicationServices.Services
                 return new Response<bool>("Phone Number is a required field.");
             if (postPersonDto.PhoneNumber.Length != 11)
                 return new Response<bool>("Phone Number must be 11 digits.");
-            
 
 
-            MemoryStream memoryStream = new MemoryStream();
-            await postPersonDto.UploadFile.CopyToAsync(memoryStream);
+            var stringBirthDate = postPersonDto.BirthDate.ToString();
 
+            stringBirthDate = stringBirthDate.Split(' ')[0];
+            var splitBirthDate = stringBirthDate.Split('-', '/');
+
+            int year = int.Parse(splitBirthDate[0]);
+            int month = int.Parse(splitBirthDate[1]);
+            int day = int.Parse(splitBirthDate[2]);
+
+            PersianCalendar pc = new PersianCalendar();
+
+            var gregorianBirthDate = pc.ToDateTime(year, month, day, 0, 0, 0, 0);
 
 
             if (postPersonDto.UploadFile != null)
@@ -54,6 +68,21 @@ namespace PhoneBookApplication.ApplicationServices.Services
 
                 postPersonDto.FilePath = uniqueFileName;
 
+
+                byte[] imageContent;
+                MemoryStream memoryStream = new MemoryStream();
+                await postPersonDto.UploadFile.CopyToAsync(memoryStream);
+
+                memoryStream.Position = 0;
+                imageContent = memoryStream.ToArray();
+
+                var image = new Image
+                {
+                    ImageBinaryData = imageContent,
+                };
+
+                await _imageRepository.Insert(image);
+
             }
 
             var person = new Person
@@ -61,14 +90,14 @@ namespace PhoneBookApplication.ApplicationServices.Services
                 FirstName = postPersonDto.FirstName,
                 LastName = postPersonDto.LastName,
                 PhoneNumber = postPersonDto.PhoneNumber,
-                BirthDate = postPersonDto.BirthDate,
+                BirthDate = gregorianBirthDate,
                 FilePath = postPersonDto.FilePath,
 
-                
-                
+
+
 
             };
-            
+
 
             await _personRepository.Insert(person);
 
@@ -119,7 +148,7 @@ namespace PhoneBookApplication.ApplicationServices.Services
             if (!response.IsSuccessful || response.Result == null)
                 return new Response<GetAllPersonDto>(response.ErrorMessage ?? "Failed to retrieve persons.");
 
-
+            DateTimeFormatInfo dateTimeFormatInfo = new DateTimeFormatInfo();
 
             var persons = response.Result.Select(person => new GetByIdPersonDto
             {
@@ -142,7 +171,7 @@ namespace PhoneBookApplication.ApplicationServices.Services
         #endregion
 
         #region [- Search() -]
-        public async Task<IResponse<List<SearchPersonDto>>> SearchPerson(string term)
+        public async Task<IResponse<List<GetByIdPersonDto>>> SearchPerson(string term)
         {
             await GetAllPerson();
 
@@ -151,17 +180,19 @@ namespace PhoneBookApplication.ApplicationServices.Services
 
             if (!repositoryResponse.IsSuccessful)
             {
-                return new Response<List<SearchPersonDto>>(null, false, "Error occurred.", null, HttpStatusCode.InternalServerError);
+                return new Response<List<GetByIdPersonDto>>(null, false, "Error occurred.", null, HttpStatusCode.InternalServerError);
             }
 
-            var result = repositoryResponse.Result.Select(p => new SearchPersonDto
+            var result = repositoryResponse.Result.Select(person => new GetByIdPersonDto()
             {
-                FirstName = p.FirstName,
-                LastName = p.LastName,
-                PhoneNumber = p.PhoneNumber
+                FirstName = person.FirstName,
+                LastName = person.LastName,
+                PhoneNumber = person.PhoneNumber
             }).ToList();
 
-            return new Response<List<SearchPersonDto>>(result);
+
+
+            return new Response<List<GetByIdPersonDto>>(result);
         }
 
         #endregion
@@ -182,6 +213,7 @@ namespace PhoneBookApplication.ApplicationServices.Services
                 return new Response<bool>("Phone Number is a required field.");
             if (putPersonDto.PhoneNumber.Length != 11)
                 return new Response<bool>("Phone Number must be 11 digits.");
+
 
 
             var personResponse = await _personRepository.SelectById(putPersonDto.Id);
@@ -217,6 +249,21 @@ namespace PhoneBookApplication.ApplicationServices.Services
                 await putPersonDto.UploadFile.CopyToAsync(stream);
 
                 person.FilePath = uniqueFileName;
+
+
+                byte[] imageContent;
+                MemoryStream memoryStream = new MemoryStream();
+                await putPersonDto.UploadFile.CopyToAsync(memoryStream);
+
+                memoryStream.Position = 0;
+                imageContent = memoryStream.ToArray();
+
+                var image = new Image
+                {
+                    ImageBinaryData = imageContent,
+                };
+
+                await _imageRepository.Insert(image);
             }
 
             await _personRepository.Update(person);
